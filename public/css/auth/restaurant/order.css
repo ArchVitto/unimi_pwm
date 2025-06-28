@@ -1,0 +1,181 @@
+:root {
+    --primary-red: #dc3545;
+    --dark-red: #bb2d3b;
+    --light-red: #f8d7da;
+    --light-bg: #f8f9fa;
+    --dark-text: #212529;
+    --light-green: #f0fff0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    line-height: 1.6;
+    padding: 1rem;
+  }
+  
+  .header-dashboard {
+    background-color: var(--primary-red);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  
+  .header-dashboard h1 {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .header-dashboard .lead {
+    opacity: 0.9;
+  }
+  
+  .card {
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.15);
+  }
+  
+  .card-header {
+    background-color: var(--primary-red);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--dark-red);
+    border-color: var(--dark-red);
+  }
+  
+  .btn-outline-primary {
+    color: var(--primary-red);
+    border-color: var(--primary-red);
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: var(--primary-red);
+    color: white;
+  }
+  
+  .badge-red {
+    background-color: white;
+    color: var(--primary-red);
+    font-weight: bold;
+    padding: 0.35rem 0.65rem;
+    border-radius: 50px;
+  }
+  
+  .product-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .product-item:last-child {
+    border-bottom: none;
+  }
+  
+  .form-control:focus {
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+    background-color: white;
+    border-radius: 8px;
+    margin: 2rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .empty-state-icon {
+    font-size: 3rem;
+    color: var(--primary-red);
+    margin-bottom: 1rem;
+  }
+  
+  .search-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+  }
+  
+  .search-input {
+    padding-left: 35px;
+  }
+  
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+  }
+  
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .popup-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+
+  .time-badge {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    color: #495057;
+  }
+
+  .time-warning {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  .time-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+  }

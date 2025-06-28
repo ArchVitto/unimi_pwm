@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Modifica Account | FastFood Express</title>
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="./../../../css/auth/restaurant/account.css">
+
+
+
+</head>
+<body class="bg-light py-5">
+
+  <div class="container" x-data="accountForm()" x-init="fetchData()">
+    
+    <!-- Header Contestualizzato -->
+    <div class="text-center bg-danger text-white p-4 rounded-3 mb-4 shadow">
+      <h1 class="mb-2"><i class="bi bi-egg-fried me-2"></i>FastFood Express</h1>
+      <p class="lead mb-0">Gestione account</p>
+    </div>
+
+    <!-- Top Nav -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold">Gestione Account</h2>
+      <div>
+        <a href="/restaurant/dashboard" class="btn btn-outline-secondary me-2">🏠 Dashboard</a>
+        <button class="btn btn-danger" @click="logout">🔓 Logout</button>
+      </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card shadow-sm rounded p-4 bg-white">
+      <form
+        hx-put="/restaurant/account"
+        hx-trigger="submit"
+        @htmx:after-request.window="handleResponse($event.detail.xhr.response)"
+        hx-target="this"
+        hx-swap="none"
+        novalidate
+      >
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold" for="nome">Nome</label>
+            <input id="nome" name="nome" class="form-control" x-model="form.nome" required minlength="2" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold" for="cognome">Cognome</label>
+            <input id="cognome" name="cognome" class="form-control" x-model="form.cognome" required minlength="2" />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="email">Email</label>
+          <input id="email" name="email" type="email" class="form-control" x-model="form.email" required />
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold" for="nome_ristorante">Nome Ristorante</label>
+            <input id="nome_ristorante" name="nome_ristorante" class="form-control" x-model="form.nome_ristorante" required minlength="2" maxlength="100" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold" for="indirizzo_ristorante">Indirizzo Ristorante</label>
+            <input id="indirizzo_ristorante" name="indirizzo_ristorante" class="form-control" x-model="form.indirizzo_ristorante" required minlength="5" />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="partita_iva">Partita IVA</label>
+          <input id="partita_iva" name="partita_iva" class="form-control" x-model="form.partita_iva" required pattern="^[0-9]{11}$" />
+          <div class="form-text">11 cifre numeriche, unica per ogni ristorante.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="numero_telefono">Numero di Telefono</label>
+          <input id="numero_telefono" name="numero_telefono" type="tel" class="form-control" x-model="form.numero_telefono" required pattern="^\+?[0-9]{8,15}$" />
+          <div class="form-text">Deve contenere solo numeri, da 8 a 15 cifre (es. +393331234567)</div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="immagine">URL Immagine Profilo</label>
+          <input id="immagine" name="immagine" type="url" class="form-control" x-model="form.immagine" placeholder="https://..." />
+          <div class="form-text">Inserisci un URL valido di immagine (.jpg, .png, .webp...)</div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="descrizione">Descrizione Ristorante</label>
+          <textarea id="descrizione" name="descrizione" class="form-control" x-model="form.descrizione" maxlength="1000" rows="4" placeholder="Scrivi una breve descrizione..."></textarea>
+          <div class="form-text">Massimo 1000 caratteri</div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="password">Nuova Password (opzionale)</label>
+          <input id="password" name="password" class="form-control" minlength="5" placeholder="Lascia vuoto per non cambiarla" />
+        </div>
+
+        <div class="d-grid mt-4">
+          <button type="submit" class="btn btn-primary btn-lg shadow">💾 Salva Modifiche</button>
+        </div>
+      </form>
+
+      <!-- Feedback -->
+      <div class="mt-4">
+        <template x-if="success">
+          <div class="alert alert-success shadow-sm" x-text="message"></div>
+        </template>
+        <template x-if="error">
+          <div class="alert alert-danger shadow-sm" x-text="message"></div>
+        </template>
+      </div>
+      <div class="mt-4 text-end">
+        <button class="btn btn-outline-danger" @click="confirmDelete">❌ Elimina Account</button>
+      </div>
+      <template x-if="showDeletePopup">
+        <div class="popup-overlay">
+          <div class="popup-content text-center">
+            
+            <h4 class="mb-3">Conferma eliminazione</h4>
+            <p>
+              Sei sicuro di voler <strong>eliminare definitivamente</strong> questo account?
+            </p>
+            
+            <template x-if="!successRemove">
+              <div class="alert alert-danger mt-3" x-text="message"></div>
+            </template>
+
+            <div class="d-flex justify-content-between mt-4">
+              <button class="btn btn-secondary" @click="closeDeletePopup">Annulla</button>
+              <button class="btn btn-danger" @click="confirmDeletePopup">Elimina</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <script src="../../../javascript/auth/restaurant/account.js"></script>
+
+</body>
+</html>

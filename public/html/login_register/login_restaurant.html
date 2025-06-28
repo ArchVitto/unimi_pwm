@@ -1,0 +1,72 @@
+<form x-data="{ partitaIva: '', password: '', error: false }" @submit.prevent="submitForm" action="/auth/login/restaurant" method="POST" class="needs-validation" novalidate>
+    <!-- Messaggio di errore -->
+    <div class="mb-3">
+        <div x-show="error" class="bg-danger text-white font-bold p-3 mt-3 rounded">
+            <strong>Errore:</strong> Credenziali non valide. Riprova.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="partita_iva" class="form-label">Partita IVA</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-building-check"></i></span>
+            <input type="text" class="form-control" id="partita_iva" name="partita_iva" required x-model="partitaIva" 
+                   pattern="[0-9]{11}" title="Inserire 11 cifre della Partita IVA" 
+                   :class="{'is-invalid': error}">
+        </div>
+        <div class="form-text">Inserisci la tua Partita IVA (11 cifre)</div>
+    </div>
+    
+    <div class="mb-4">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+            <input type="password" class="form-control" id="password" name="password" required x-model="password" 
+                   :class="{'is-invalid': error}">
+        </div>
+    </div>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-danger btn-lg btn-login">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Accedi come Ristoratore
+        </button>
+    </div>
+
+
+</form>
+
+<script>
+function submitForm() {
+    const data = {
+        partita_iva: this.partitaIva,
+        password: this.password,
+    };
+
+    this.error = false;
+
+    fetch('/auth/login/restaurant', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        credentials: 'include'  // << importantissimo per cookie!
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect semplice, il cookie 'token' sarà inviato automaticamente
+            window.location.href = data.redirect;
+        } else {
+            this.error = true;
+        }
+    })
+    .catch(error => {
+        console.error('Errore durante la richiesta:', error);
+        this.error = true;
+    });
+}
+
+
+</script>
+

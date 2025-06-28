@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it" x-data="orderDashboard()" x-init="init()">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Ordini in Tempo Reale</title>
+  
+    <!-- Librerie JS -->
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  
+    <!-- Bootstrap e icone -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  
+    <link rel="stylesheet" href="./../../../css/auth/restaurant/order.css">
+  </head>
+<body class="p-4">
+  <div class="container">
+    <div class="header-dashboard">
+      <h1 class="mb-2"><i class="bi bi-cart4 me-2"></i>FastFood Express</h1>
+      <p class="lead mb-0">Dashboard ordini in tempo reale</p>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2><i class="bi bi-list-ul me-2"></i>Ordini attivi</h2>
+      <div class="d-flex gap-2">
+        <a href="/restaurant/account" class="btn btn-outline-primary">
+          <i class="bi bi-person-circle"></i> Account
+        </a>
+        <div>
+          <a href="/restaurant/dashboard" class="btn btn-outline-secondary me-2">🏠 Dashboard</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="search-container" style="width: 300px;">
+      <i class="bi bi-search search-icon"></i>
+      <input 
+        x-model="searchTerm" 
+        @input.debounce.300ms="filterOrders()" 
+        type="text" 
+        class="form-control search-input" 
+        placeholder="Cerca ordine o cliente..."
+      >
+    </div>
+
+    <template x-if="ordini.length === 0">
+      <div class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-cart-x"></i></div>
+        <h4>Nessun ordine attivo</h4>
+        <p class="text-muted">Gli ordini appariranno qui non appena ricevuti</p>
+      </div>
+    </template>
+
+    <div class="row g-4">
+      <template x-for="ordine in (searchTerm ? filteredOrders : ordini)" :key="ordine._id">
+        <div class="col-lg-6">
+          <div class="card shadow-sm">
+            <div class="card-header">
+              <span>Ordine #<span x-text="ordine._id.substring(0, 8)"></span></span>
+              <span class="badge-red" x-text="'€' + ordine.total.toFixed(2)"></span>
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-1"><i class="bi bi-calendar me-1"></i>Data ordine</h6>
+                  <p class="mb-3" x-text="new Date(ordine.orderDate).toLocaleString()"></p>
+                  
+                  <h6 class="text-muted mb-1"><i class="bi bi-clock-history me-1"></i>Tempo rimanente</h6>
+                  <template x-if="ordine.status && ordine.status.expireDate">
+                    <p>
+                      <span class="time-badge" 
+                            :class="{
+                              'time-warning': isTimeWarning(ordine.status.expireDate),
+                              'time-danger': isTimeDanger(ordine.status.expireDate)
+                            }"
+                            x-text="calculateTimeRemaining(ordine.status.expireDate)">
+                      </span>
+                      <small class="text-muted ms-1" x-text="'(' + new Date(ordine.status.expireDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ')'"></small>
+                    </p>
+                  </template>
+                  <template x-if="!ordine.status || !ordine.status.expireDate">
+                    <p class="text-muted">Non specificato</p>
+                  </template>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-1"><i class="bi bi-credit-card me-1"></i>Intestatario carta</h6>
+                  <p x-text="ordine.cardHolder"></p>
+                  
+                  <h6 class="text-muted mb-1"><i class="bi bi-info-circle me-1"></i>Stato</h6>
+                  <p>
+                    <span class="badge" 
+                          :class="{
+                            'bg-secondary': ordine.status?.status === 'ordinato',
+                            'bg-primary': ordine.status?.status === 'in preparazione',
+                            'bg-success': ordine.status?.status === 'consegnato',
+                            'bg-danger': ordine.status?.status === 'annullato'
+                          }"
+                          x-text="ordine.status?.status || 'ordinato'">
+                    </span>
+                  </p>
+                </div>
+              </div>
+              
+              <hr>
+              
+              <h5 class="mb-3"><i class="bi bi-basket me-1"></i>Prodotti</h5>
+              <ul class="list-unstyled">
+                <template x-for="p in ordine.products" :key="p.name">
+                  <li class="product-item">
+                    <div class="d-flex justify-content-between">
+                      <span x-text="p.name"></span>
+                      <span x-text="'×' + p.quantity"></span>
+                    </div>
+                    <small class="text-muted" x-text="'€' + p.price.toFixed(2) + ' cad.'"></small>
+                  </li>
+                </template>
+              </ul>
+              
+              <hr>
+              
+              <form @submit.prevent="submitMinutes(ordine._id)" class="mt-3">
+                <!-- Layout 100% solo "Aggiorna tempo" -->
+                <template x-if="((ordine.status?.status === 'ordinato') ||(ordine.status?.status === 'in preparazione')) && (!(isTimeExpired(ordine.status?.expireDate)))">
+
+                  <form @submit.prevent="submitMinutes(ordine._id)" class="mt-3">
+                    <div class="mb-3">
+                      <label :for="'minuti-'+ordine._id" class="form-label fw-bold">
+                        <i class="bi bi-clock me-1"></i>Tempo di attesa stimato
+                      </label>
+                      <div class="input-group">
+                        <input 
+                          type="number" 
+                          class="form-control" 
+                          :id="'minuti-'+ordine._id" 
+                          x-model.number="ordine.minuti" 
+                          min="1" 
+                          required 
+                          placeholder="Minuti rimanenti"
+                          
+                        >
+                        <span class="input-group-text">minuti</span>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                      <i class="bi bi-check-circle me-1"></i> Aggiorna tempo
+                    </button>
+                  </form>
+                </template>
+
+                <!-- Layout 50/50: "Aggiorna tempo" + "Consegna" -->
+                <template x-if="isTimeExpired(ordine.status?.expireDate) && ordine.status?.status === 'in preparazione'">
+                  <div class="row mt-3 align-items-end">
+                    <!-- Colonna sinistra: Aggiorna tempo -->
+                    <div class="col-md-6">
+                      <form @submit.prevent="submitMinutes(ordine._id)">
+                        <div class="mb-3">
+                          <label :for="'minuti-'+ordine._id" class="form-label fw-bold">
+                            <i class="bi bi-clock me-1"></i>Tempo di attesa stimato
+                          </label>
+                          <div class="input-group">
+                            <input 
+                              type="number" 
+                              class="form-control" 
+                              :id="'minuti-'+ordine._id" 
+                              x-model.number="ordine.minuti" 
+                              min="1" 
+                              required 
+                              placeholder="Minuti rimanenti"
+                            >
+                            <span class="input-group-text">minuti</span>
+                          </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                          <i class="bi bi-check-circle me-1"></i> Aggiorna tempo
+                        </button>
+                      </form>
+                    </div>
+
+                    <!-- Colonna destra: Consegna -->
+                    <div class="col-md-6">
+                      <button 
+                        class="btn btn-success w-100 mt-4 mt-md-0"
+                        @click="markAsDelivered(ordine._id)">
+                        <i class="bi bi-check2-circle me-1"></i> Consegna
+                      </button>
+                    </div>
+                  </div>
+                </template>
+
+              </form>
+            </div>
+          </div>
+        </div>
+        
+      </template>
+      
+    </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <template x-if="showToast">
+      <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header" :class="toastType === 'success' ? 'bg-success text-white' : 'bg-danger text-white'">
+          <strong class="me-auto" x-text="toastTitle"></strong>
+          <button type="button" class="btn-close btn-close-white" @click="showToast = false"></button>
+        </div>
+        <div class="toast-body" x-text="toastMessage"></div>
+      </div>
+    </template>
+  </div>
+
+  <script src="../../../javascript/auth/restaurant/order.js"></script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0

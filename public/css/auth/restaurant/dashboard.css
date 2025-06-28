@@ -1,0 +1,65 @@
+.tag-pill {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    margin: 0.15em;
+    font-size: 0.75em;
+    font-weight: 500;
+    line-height: 1;
+    color: #495057;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border: 1px solid #dee2e6;
+    border-radius: 50rem;
+    background-color: #f8f9fa;
+  }
+  .card-body {
+    padding-bottom: 0.5rem;
+  }
+  .card-footer {
+    background: transparent;
+    border-top: none;
+    padding-top: 0;
+  }
+  .search-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #6c757d;
+  }
+  .search-input {
+    padding-left: 40px;
+  }
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+  }
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .popup-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .bg-light-green {
+    background-color: #d4edda !important;
+  }

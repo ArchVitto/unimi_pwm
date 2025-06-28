@@ -1,0 +1,45 @@
+body {
+    background-color: #f8f9fa;
+  }
+
+  .card-body {
+    padding-bottom: 0.5rem;
+  }
+
+  .card-footer {
+    background: transparent;
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .search-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+  }
+
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #6c757d;
+  }
+
+  .search-input {
+    padding-left: 40px;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+  }
+
+  .restaurant-card:hover {
+    transform: scale(1.02);
+  }
+
+  .restaurant-card {
+    transition: transform 0.2s ease-in-out;
+  }

@@ -1,0 +1,133 @@
+<!-- FORM DI REGISTRAZIONE (stile identico al login) -->
+<form x-data="{
+  // campi del form
+  nome: '',
+  cognome: '',
+  username: '',
+  email: '',
+  password: '',
+  confermaPassword: '',
+  indirizzoConsegna: '',
+  telefono: '',
+  error: false,
+
+  async submitForm() {
+      // azzera eventuali errori
+      this.error = false;
+
+      // prepara il payload
+      const payload = {
+          nome: this.nome,
+          cognome: this.cognome,
+          username: this.username,
+          email: this.email,
+          password: this.password,
+          conferma_password: this.confermaPassword,
+          indirizzo_consegna: this.indirizzoConsegna,
+          telefono: this.telefono,
+      };
+
+      try {
+          const res = await fetch('/auth/register/costumer', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+          });
+
+          // se il backend segnala redirect => vai alla pagina indicata
+          if (res.ok) {
+              const json = await res.json();
+              if (json.redirect) {
+                  window.location.href = json.redirect;
+                  return;
+              }
+          }
+      } catch (e) {
+          console.error('Errore durante la richiesta:', e);
+      }
+
+      // se siamo qui c’è stato un problema
+      this.error = true;
+  }
+}"
+@submit.prevent="submitForm"
+action="/auth/register/costumer"
+method="POST"
+class="needs-validation"
+novalidate>
+
+<!-- messaggio di errore -->
+<div class="mb-3" x-show="error">
+  <div class="bg-danger text-white font-bold p-3 rounded">
+      <strong>Errore:</strong> registrazione non riuscita. Riprova.
+  </div>
+</div>
+
+<input type="hidden" name="tipo_utente" value="cliente">
+
+<div class="row g-3 mb-3">
+  <div class="col-md-6">
+      <label for="nome" class="form-label">Nome</label>
+      <input type="text" id="nome" name="nome" x-model="nome" class="form-control" required>
+  </div>
+
+  <div class="col-md-6">
+      <label for="cognome" class="form-label">Cognome</label>
+      <input type="text" id="cognome" name="cognome" x-model="cognome" class="form-control" required>
+  </div>
+
+  <div class="col-12">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" id="username" name="username" x-model="username" class="form-control" required>
+  </div>
+
+  <div class="col-12">
+      <label for="email" class="form-label">Indirizzo Email</label>
+      <input type="email" id="email" name="email" x-model="email" class="form-control" required>
+      <div class="form-text">Non condivideremo mai la tua email con altri.</div>
+  </div>
+
+  <div class="col-md-6">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" id="password" name="password" x-model="password" class="form-control" required>
+  </div>
+
+  <div class="col-md-6">
+      <label for="confermaPassword" class="form-label">Conferma Password</label>
+      <input type="password" id="confermaPassword" name="conferma_password" x-model="confermaPassword" class="form-control" required>
+  </div>
+
+  <div class="col-12 mt-3">
+      <label for="indirizzoConsegna" class="form-label">Indirizzo di Consegna</label>
+      <textarea id="indirizzoConsegna" name="indirizzo_consegna" x-model="indirizzoConsegna" rows="2" class="form-control"></textarea>
+  </div>
+
+  <div class="col-12">
+      <label for="telefono" class="form-label">Numero di Telefono</label>
+      <input type="tel" id="telefono" name="telefono" x-model="telefono" class="form-control">
+  </div>
+</div>
+
+<div class="form-check mb-3">
+  <input class="form-check-input" type="checkbox" id="terminiCheck" required > 
+  <label class="form-check-label" for="terminiCheck" >
+      Accetto i <a href="#" class="text-decoration-none text-danger">Termini di Servizio</a> e l'<a href="#" class="text-decoration-none text-danger">Informativa sulla Privacy</a>
+  </label>
+</div>
+
+<div class="d-grid mb-3">
+  <button type="submit" class="btn btn-danger btn-lg">
+      <i class="bi bi-box-arrow-in-right me-2"></i>Registrati come Cliente
+  </button>
+</div>
+</form>
+
+<!-- opzionale: log di avvenuta inizializzazione Alpine -->
+<script>
+document.addEventListener('alpine:init', () => {
+  console.log('✅ Alpine inizializzato correttamente');
+});
+</script>
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">

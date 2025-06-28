@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="it" x-data="userOrders()" x-init="init()">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  
+  <!-- Librerie JS -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  
+  <!-- Bootstrap e icone -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+  <link rel="stylesheet" href="./../../../css/auth/costumer/order.css">
+
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="text-center bg-danger text-white p-4 rounded-3 mb-4 shadow">
+        <h1 class="mb-2"><i class="bi bi-egg-fried me-2"></i>FastFood Express</h1>
+        <p class="lead mb-0">Storico ordini</p>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <h1 class="mb-0"><i class="bi bi-cart4 me-2"></i>I miei ordini</h1>
+      <a href="/costumer/dashboard" class="btn btn-outline-secondary me-2">🏠 Dashboard</a>
+    </div>
+    
+    <div class="search-container">
+      <i class="bi bi-search search-icon"></i>
+      <input 
+        x-model="searchTerm" 
+        @input.debounce.300ms="filterOrders()" 
+        type="text" 
+        class="form-control search-input" 
+        placeholder="Cerca ordine o piatto..."
+      >
+    </div>
+
+    <template x-if="loading">
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Caricamento...</span>
+        </div>
+        <p class="mt-2">Caricamento ordini...</p>
+      </div>
+    </template>
+
+    <template x-if="!loading && orders.length === 0">
+      <div class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-cart-x"></i></div>
+        <h4>Nessun ordine effettuato</h4>
+        <p class="text-muted">I tuoi ordini appariranno qui una volta effettuati</p>
+        <a href="/" class="btn btn-primary mt-3">
+          <i class="bi bi-basket me-1"></i> Vai allo shop
+        </a>
+      </div>
+    </template>
+
+    <div class="row g-4">
+      <template x-for="order in (searchTerm ? filteredOrders : orders)" :key="order._id">
+        <div class="col-12">
+          <div class="card order-card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <div>
+                <span class="fw-bold">Ordine #<span x-text="order._id.substring(0, 8).toUpperCase()"></span></span>
+                <span class="text-muted ms-2" x-text="new Date(order.orderDate).toLocaleDateString()"></span>
+              </div>
+              <div>
+                <span class="badge bg-primary rounded-pill" x-text="'€' + order.total.toFixed(2)"></span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-1"><i class="bi bi-calendar me-1"></i>Data ordine</h6>
+                  <p x-text="new Date(order.orderDate).toLocaleString()"></p>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-1"><i class="bi bi-info-circle me-1"></i>Stato</h6>
+                  <p>
+                    <span class="badge badge-status" 
+                          :class="{
+                            'bg-secondary': order.status?.status === 'ordinato',
+                            'bg-primary': order.status?.status === 'in preparazione',
+                            'bg-success': order.status?.status === 'consegnato',
+                            'bg-danger': order.status?.status === 'annullato'
+                          }"
+                          x-text="order.status?.status || 'ordinato'">
+                    </span>
+                  </p>
+                </div>
+              </div>
+              
+              <hr>
+              
+              <h5 class="mb-3"><i class="bi bi-basket me-1"></i>Prodotti ordinati</h5>
+              <ul class="list-unstyled">
+                <template x-for="product in order.products" :key="product._id">
+                  <li class="product-item">
+                    <div class="d-flex justify-content-between">
+                      <span x-text="product.name || 'Prodotto non disponibile'"></span>
+                      <span x-text="'×' + product.quantity"></span>
+                    </div>
+                    <small class="text-muted" x-text="'€' + product.price.toFixed(2) + ' cad.'"></small>
+                  </li>
+                </template>
+              </ul>
+              
+              <hr>
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1"><i class="bi bi-credit-card me-1"></i>Metodo di pagamento</h6>
+                  <p x-text="order.paymentMethod || 'Carta di credito'"></p>
+                </div>
+                <div class="text-end">
+                  <h6 class="text-muted mb-1">Totale ordine</h6>
+                  <h5 x-text="'€' + order.total.toFixed(2)"></h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <template x-if="showToast">
+      <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header" :class="toastType === 'success' ? 'bg-success text-white' : 'bg-danger text-white'">
+          <strong class="me-auto" x-text="toastTitle"></strong>
+          <button type="button" class="btn-close btn-close-white" @click="showToast = false"></button>
+        </div>
+        <div class="toast-body" x-text="toastMessage"></div>
+      </div>
+    </template>
+  </div>
+
+  <script src="../../../javascript/auth/costumer/order.js"></script>
+
+  </script>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

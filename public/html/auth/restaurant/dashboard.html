@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="it" x-data="mealsApp()" x-init="loadMeals()">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elenco Piatti</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <link rel="stylesheet" href="./../../../css/auth/restaurant/dashboard.css">
+
+</head>
+
+<body class="p-4">
+  <div class="container">
+    <div class="text-center bg-danger text-white p-4 rounded-3 mb-4 shadow">
+      <h1 class="mb-2"><i class="bi bi-egg-fried me-2"></i>FastFood Express</h1>
+      <p class="lead mb-0">Dashboard piatti</p>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Piatti</h1>
+      <div class="d-flex gap-2">
+        <a href="/restaurant/neworder" class="btn btn-warning">
+          <i class="bi bi-people-fill"></i> Visualizza coda
+        </a>
+        <a href="/restaurant/account" class="btn btn-outline-primary">
+          <i class="bi bi-person-circle"></i> Account
+        </a>
+        <a href="/restaurant/new" class="btn btn-success">
+          <i class="bi bi-plus-lg"></i> Crea nuovo piatto
+        </a>
+        <a href="/api/restaurant" class="btn btn-info">
+          <i class="bi bi-cloud"></i> Api
+        </a>
+      </div>
+    </div>
+    
+
+    <div class="search-container" style="width: 300px;">
+      <i class="bi bi-search search-icon"></i>
+      <input 
+        x-model="searchTerm" 
+        @input.debounce.300ms="filterMeals()" 
+        type="text" 
+        class="form-control search-input" 
+        placeholder="Cerca piatto o tag..."
+      >
+    </div>
+
+    <template x-if="filteredMeals.length === 0">
+      <div class="no-results">
+        <i class="bi bi-emoji-frown" style="font-size: 2rem;"></i>
+        <p class="mt-2">Nessun piatto trovato</p>
+      </div>
+    </template>
+
+    <div class="row g-4">
+      <template x-for="meal in filteredMeals" :key="meal._id">
+        <div class="col-md-4 col-lg-3">
+          <div class="card h-100 shadow-sm" :class="{ 'bg-light-green': meal.price !== null }">
+            <img :src="meal.strMealThumb" :alt="meal.strMeal" class="card-img-top" style="height:180px; object-fit:cover;" />
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title" x-text="meal.strMeal"></h5>
+              <p class="card-text mb-2"><i class="bi bi-geo-alt-fill me-1"></i><strong>Paese:</strong> <span x-text="meal.strArea"></span></p>
+              <template x-if="meal.price !== null">
+                <p class="card-text text-success mb-2"><strong>Prezzo:</strong> € <span x-text="meal.price.toFixed(2)"></span></p>
+              </template>
+              <template x-if="meal.strTags">
+                <div class="mb-2">
+                  <template x-for="tag in meal.strTags.split(',')">
+                    <span class="tag-pill" x-text="tag.trim()"></span>
+                  </template>
+                </div>
+              </template>
+            </div>
+
+            <div class="card-footer mt-auto pt-0">
+              <a :href="'/restaurant/' + meal.idMeal" class="btn btn-warning w-100">
+                <i class="bi bi-arrow-right-circle ms-2"></i> Vedi Dettagli 
+              </a>
+            </div>
+            <div class="card-footer mt-auto pt-0 d-flex gap-2">
+              <button 
+                @click="showPopup(meal._id)" 
+                class="btn btn-success flex-grow-1">
+                <i class="bi bi-currency-euro me-1" x-show="meal.price !== null"></i>
+                <i class="bi bi-plus-circle me-1" x-show="meal.price === null"></i>
+                <span x-text="meal.price !== null ? 'Modifica prezzo' : 'Aggiungi al menu'"></span>
+            </button>
+              <button 
+                x-show="meal.price !== null"
+                @click="showPopupDelete(meal._id)"
+                class="btn btn-danger">
+                <i class="bi bi-trash"></i>
+            </button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- Popup per inserire il prezzo -->
+  <template x-if="showPricePopup">
+    <div class="popup-overlay">
+      <div class="popup-content">
+        <h4 class="mb-3">Inserire Prezzo</h4>
+        <form @submit.prevent="submitPrice">
+          <div class="mb-3">
+            <input 
+              x-model="priceInput" 
+              type="number" 
+              step="0.50" 
+              min="0"
+              max="999" 
+              class="form-control" 
+              placeholder="Prezzo (es. 9.99)" 
+              required
+            >
+          </div>
+          <div class="d-flex justify-content-between">
+            <button type="button" @click="closePopup" class="btn btn-secondary">Annulla</button>
+            <button type="submit" class="btn btn-primary">Invia</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </template>
+
+  <!-- Popup conferma eliminazione -->
+  <template x-if="showDeletePopup">
+    <div class="popup-overlay">
+      <div class="popup-content text-center">
+        <h4 class="mb-3">Conferma eliminazione</h4>
+        <p>
+          Sei sicuro di voler <strong>eliminare</strong> questo piatto dal menu?
+        </p>
+        <div class="d-flex justify-content-between mt-4">
+          <button class="btn btn-secondary" @click="closeDeletePopup">Annulla</button>
+          <button class="btn btn-danger" @click="confirmDelete">Elimina</button>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+
+  <script src="../../../javascript/auth/restaurant/dashboard.js"></script>
+</body>
+</html>

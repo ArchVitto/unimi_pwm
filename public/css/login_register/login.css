@@ -1,0 +1,29 @@
+.user-type-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.user-type-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255,0,0,0.1);
+}
+.user-type-card.active {
+    border: 2px solid #dc3545;
+    background-color: rgba(220, 53, 69, 0.05);
+}
+.login-container {
+    min-height: 80vh;
+}
+.btn-login {
+    transition: all 0.2s ease;
+    background-color: #dc3545;
+    color: white;
+}
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    background-color: #c82333;
+}
+
+.registration-container {
+    min-height: 80vh;
+}

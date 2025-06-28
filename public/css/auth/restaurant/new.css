@@ -1,0 +1,28 @@
+body {
+    background: #f3f5f7;
+  }
+  .form-section {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    padding: 2rem;
+  }
+  .btn-outline-primary {
+    border-color: #30a37a;
+    color: #30a37a;
+  }
+  .btn-outline-primary:hover {
+    background-color: #30a37a;
+    color: #fff;
+  }
+  .btn-success {
+    background-color: #30a37a;
+    border-color: #30a37a;
+  }
+  .btn-success:hover {
+    background-color: #278e69;
+    border-color: #278e69;
+  }
+  .form-label {
+    font-weight: 500;
+  }  

@@ -1,0 +1,67 @@
+<form x-data="{ username: '', password: '', error: false }" @submit.prevent="submitForm" action="/auth/login/costumer" method="POST" class="needs-validation" novalidate>
+    <!-- Messaggio di errore -->
+    <div class="mb-3">
+        <div x-show="error" class="bg-danger text-white font-bold p-3 mt-3 rounded">
+            <strong>Errore:</strong> Credenziali non valide. Riprova.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+            <input type="text" class="form-control" id="username" name="username" required x-model="username" :class="{'is-invalid': error}">
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+            <input type="password" class="form-control" id="password" name="password" required x-model="password" :class="{'is-invalid': error}">
+        </div>
+    </div>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-danger btn-lg btn-login">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Accedi come Cliente
+        </button>
+    </div>
+</form>
+<script>
+    document.addEventListener('alpine:init', () => {
+      console.log('✅ Alpine inizializzato correttamente');
+    });
+  </script>
+<script>
+    function submitForm() {
+        const data = {
+            username: this.username,
+            password: this.password,
+        };
+
+        // Resetta l'errore prima di ogni invio
+        this.error = false;
+
+        // Invia i dati in modo asincrono
+        fetch('/auth/login/costumer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.redirect) {
+                window.location.href = data.redirect; // Esegui il redirect
+            } else {
+                this.error = true; // Mostra l'errore se il login fallisce
+            }
+        })
+        .catch(error => {
+            console.error('Errore durante la richiesta:', error);
+            this.error = true; // Errore generico
+        });
+    }
+</script>

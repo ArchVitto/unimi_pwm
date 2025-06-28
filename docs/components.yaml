@@ -1,0 +1,242 @@
+components:
+  schemas:
+    Costumer:
+      type: object
+      properties:
+        _id:
+          type: string
+        nome:
+          type: string
+        cognome:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        indirizzo_consegna:
+          type: string
+        telefono:
+          type: string
+        data_registrazione:
+          type: string
+          format: date-time
+    Restaurant:
+      type: object
+      properties:
+        _id:
+          type: string
+        nome:
+          type: string
+        cognome:
+          type: string
+        email:
+          type: string
+        nome_ristorante:
+          type: string
+        indirizzo_ristorante:
+          type: string
+        numero_telefono:
+          type: string
+        immagine:
+          type: string
+        descrizione:
+          type: string
+        partita_iva:
+          type: string
+        data_registrazione:
+          type: string
+          format: date-time
+    Order:
+      type: object
+      required:
+        - username
+        - cardHolder
+        - partitaIva
+        - total
+        - products
+        - status
+      properties:
+        _id:
+          type: string
+          example: "684eb79299f9aa244e4dd066"
+        username:
+          type: string
+          example: "aaaaa"
+        cardHolder:
+          type: string
+          example: "Vittorio Moretti"
+        partitaIva:
+          type: string
+          example: "11112222333"
+        total:
+          type: number
+          example: 16
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: "683708380b10c33fb6afac3d"
+              price:
+                type: number
+                example: 10
+              quantity:
+                type: number
+                example: 1
+        status:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: ['ordinato', 'in preparazione', 'consegnato', 'annullato']
+              example: "consegnato"
+            startDate:
+              type: string
+              format: date-time
+              example: "2025-06-15T12:38:42.557Z"
+            expireDate:
+              type: string
+              format: date-time
+              example: "2025-06-15T12:42:42.557Z"
+        orderDate:
+          type: string
+          format: date-time
+          example: "2025-06-15T12:07:46.770Z"
+        __v:
+          type: integer
+          example: 0
+
+    Meal:
+      type: object
+      required:
+        - idMeal
+        - strMeal
+        - strCategory
+        - strArea
+        - partita_iva
+      properties:
+        _id:
+          type: string
+          example: "683708380b10c33fb6afac3e"
+        idMeal:
+          type: string
+          example: "52893"
+        strMeal:
+          type: string
+          example: "Apple & Blackberry Crumble"
+        strMealAlternate:
+          type: string
+          nullable: true
+          example: null
+        strCategory:
+          type: string
+          example: "Dessert"
+        strArea:
+          type: string
+          example: "British"
+        strInstructions:
+          type: string
+          example: >
+            Heat oven to 190C/170C fan/gas 5. Tip the flour and sugar into a large bowl. 
+            Add the butter, then rub into the flour using your fingertips to make a light breadcrumb texture. 
+            Do not overwork it or the crumble will become heavy. Sprinkle the mixture evenly over a baking sheet 
+            and bake for 15 mins or until lightly coloured.
+            Meanwhile, for the compote, peel, core and cut the apples into 2cm dice. Put the butter and sugar 
+            in a medium saucepan and melt together over a medium heat. Cook for 3 mins until the mixture turns 
+            to a light caramel. Stir in the apples and cook for 3 mins. Add the blackberries and cinnamon, and 
+            cook for 3 mins more. Cover, remove from the heat, then leave for 2-3 mins to continue cooking in 
+            the warmth of the pan.
+            To serve, spoon the warm fruit into an ovenproof gratin dish, top with the crumble mix, then reheat 
+            in the oven for 5-10 mins. Serve with vanilla ice cream.
+        strMealThumb:
+          type: string
+          format: uri
+          example: "https://www.themealdb.com/images/media/meals/xvsurr1511719182.jpg"
+        strTags:
+          type: string
+          example: "Pudding"
+        strYoutube:
+          type: string
+          format: uri
+          example: "https://www.youtube.com/watch?v=4vhcOwVBDO4"
+        strSource:
+          type: string
+          format: uri
+          example: "https://www.bbcgoodfood.com/recipes/778642/apple-and-blackberry-crumble"
+        strImageSource:
+          type: string
+          nullable: true
+          example: null
+        strCreativeCommonsConfirmed:
+          type: string
+          nullable: true
+          example: null
+        dateModified:
+          type: string
+          nullable: true
+          example: null
+        ingredients:
+          type: array
+          items:
+            type: string
+          example:
+            - "Plain Flour"
+            - "Caster Sugar"
+            - "Butter"
+            - "Braeburn Apples"
+            - "Butter"
+            - "Demerara Sugar"
+            - "Blackberries"
+            - "Cinnamon"
+            - "Ice Cream"
+        measures:
+          type: array
+          items:
+            type: string
+          example:
+            - "120g"
+            - "60g"
+            - "60g"
+            - "300g"
+            - "30g"
+            - "30g"
+            - "120g"
+            - "¼ teaspoon"
+            - "to serve"
+        partita_iva:
+          type: string
+          example: "0"
+        __v:
+          type: integer
+          example: 0
+
+    MealWithPrice:
+      type: object
+      required:
+        - idMeal
+        - partita_iva
+        - price
+      properties:
+        _id:
+          type: string
+          example: "683c2370e73692d73b6f5a9e"
+        idMeal:
+          type: string
+          example: "683708380b10c33fb6afac3e"
+        partita_iva:
+          type: string
+          example: "12345678912"
+        price:
+          type: number
+          example: 7
+        __v:
+          type: integer
+          example: 0
+
+
+
+
+
+          

@@ -1,0 +1,64 @@
+.meal-card:hover {
+    transform: scale(1.01);
+    transition: transform 0.2s;
+  }
+  .meal-image-container {
+    height: 200px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .meal-image {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  .cart-toggle-btn {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1050;
+  }
+
+.favorite-badge {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  z-index: 1;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.favorite-card {
+  border: 3px solid #ffc107;
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+  position: relative;
+}
+.tag-badge {
+  font-size: 1rem; 
+  padding: 0.35em 0.65em; 
+  margin-right: 0.4rem; 
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem; 
+  transition: all 0.2s;
+}
+.tag-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.favorite-tag {
+  background-color: #ffc107;
+  color: #000;
+  font-weight: bold;
+  border-color: #ffc107;
+  padding: 0.4em 0.75em; 
+}
+.tag-container {
+  margin-top: 0.5rem;
+  line-height: 1.8; 
+}
